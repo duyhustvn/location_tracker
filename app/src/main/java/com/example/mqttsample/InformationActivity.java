@@ -48,6 +48,8 @@ public class InformationActivity extends AppCompatActivity {
             licensePlate.setText(userInfo.getLicensePlate());
 
             Intent locationIntent = new Intent(this, LocationActivity.class);
+            locationIntent.putExtra("username", userInfo.getUsername());
+            locationIntent.putExtra("licensePlate", userInfo.getLicensePlate());
             startActivity(locationIntent);
         }
 

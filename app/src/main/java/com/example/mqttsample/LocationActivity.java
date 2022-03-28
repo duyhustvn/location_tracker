@@ -9,6 +9,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -44,6 +46,10 @@ public class LocationActivity extends AppCompatActivity {
     final String serverURI = "tcp://test.mosquitto.org";
     String clientId = "android_mqtt";
     String locationTopic = "org.location";
+    TextView username;
+    TextView licensePlate;
+
+    Bundle extras;
 
 
     MqttAndroidClient mqttAndroidClient;
@@ -54,9 +60,20 @@ public class LocationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_location);
 
         if (Build.VERSION.SDK_INT >= 23) {
             requestPermissions(PERMISSIONS, PERMISSION_ALL);
+        }
+
+        username = findViewById(R.id.activity_location_username);
+        licensePlate = findViewById(R.id.activity_location_license_plate);
+
+
+        extras = getIntent().getExtras();
+        if (extras != null) {
+            username.setText(extras.getString("username"));
+            licensePlate.setText(extras.getString("licensePlate"));
         }
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -121,26 +138,6 @@ public class LocationActivity extends AppCompatActivity {
             ex.printStackTrace();
         }
     }
-
-//    @RequiresApi(api = Build.VERSION_CODES.O)
-//    @Override
-//    public void onLocationChanged(@NonNull Location location) {
-//        Log.e("onLocationChange ", "Got new location");
-//        try {
-//            JSONObject locationMessageData = new JSONObject();
-//            locationMessageData.put("lat", location.getLatitude());
-//            locationMessageData.put("lng", location.getLongitude());
-//            locationMessageData.put("speed", location.getSpeedAccuracyMetersPerSecond());
-//
-//            publishMessage(locationTopic, locationMessageData.toString());
-//            showToast("Got Coordinates: " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT);
-//            locationManager.removeUpdates(this);
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//    }
 
     LocationListener locationListener = new LocationListener() {
         @RequiresApi(api = Build.VERSION_CODES.O)
