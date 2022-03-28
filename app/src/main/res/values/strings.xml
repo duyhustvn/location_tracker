@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Location Tracker</string>
+    <string name="form_title">Thông tin</string>
+    <string name="form_username">Họ và tên</string>
+    <string name="form_license_plate">Biển số xe</string>
+    <string name="submit">Submit</string>
 </resources>

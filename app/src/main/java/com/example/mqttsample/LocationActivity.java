@@ -28,11 +28,15 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LocationActivity extends AppCompatActivity implements LocationListener {
+public class LocationActivity extends AppCompatActivity {
     // Location
     LocationManager locationManager;
+    Location location;
+    boolean isGPSEnabled = false;
+    boolean isNetworkEnabled = false;
+
     private static final int GPS_TIME_INTERVAL = 1000 * 60; // get gps location every 10 second
-    private static final int GPS_DISTANCE = 1000; // set the distance value in meter
+    private static final int GPS_DISTANCE = 0; // set the distance value in meter
     private static final int HANDLER_DELAY = 1000 * 10;
     private static final int START_HANDLER_DELAY = 0;
 
@@ -40,6 +44,7 @@ public class LocationActivity extends AppCompatActivity implements LocationListe
     final String serverURI = "tcp://test.mosquitto.org";
     String clientId = "android_mqtt";
     String locationTopic = "org.location";
+
 
     MqttAndroidClient mqttAndroidClient;
 
@@ -102,13 +107,13 @@ public class LocationActivity extends AppCompatActivity implements LocationListe
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     Log.e("MQTT: ", "Kết nối MQTT thành công");
-                    showToast("Kết nối mqtt thành công");
+                    showToast("Kết nối mqtt thành công", Toast.LENGTH_SHORT);
                     // subscribeTopic(temperatureTopic);
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    showToast("Kết nối mqtt thất bại " + exception.getMessage());
+                    showToast("Kết nối mqtt thất bại " + exception.getMessage(), Toast.LENGTH_SHORT);
                     Log.e("mqtt", exception.getMessage());
                 }
             });
@@ -117,37 +122,70 @@ public class LocationActivity extends AppCompatActivity implements LocationListe
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        Log.d("mylog", "Got Location: " + location.getLatitude() + ", " + location.getLongitude());
+//    @RequiresApi(api = Build.VERSION_CODES.O)
+//    @Override
+//    public void onLocationChanged(@NonNull Location location) {
+//        Log.e("onLocationChange ", "Got new location");
+//        try {
+//            JSONObject locationMessageData = new JSONObject();
+//            locationMessageData.put("lat", location.getLatitude());
+//            locationMessageData.put("lng", location.getLongitude());
+//            locationMessageData.put("speed", location.getSpeedAccuracyMetersPerSecond());
+//
+//            publishMessage(locationTopic, locationMessageData.toString());
+//            showToast("Got Coordinates: " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT);
+//            locationManager.removeUpdates(this);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//    }
 
-        try {
-            JSONObject locationMessageData = new JSONObject();
-            locationMessageData.put("lat", location.getLatitude());
-            locationMessageData.put("lng", location.getLongitude());
-            locationMessageData.put("speed", location.getSpeedAccuracyMetersPerSecond());
+    LocationListener locationListener = new LocationListener() {
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        @Override
+        public void onLocationChanged(@NonNull Location location) {
+            Log.e("onLocationChange ", "Got new location");
+            try {
+                JSONObject locationMessageData = new JSONObject();
+                locationMessageData.put("lat", location.getLatitude());
+                locationMessageData.put("lng", location.getLongitude());
+                locationMessageData.put("speed", location.getSpeedAccuracyMetersPerSecond());
 
-            publishMessage(locationTopic, locationMessageData.toString());
-            Toast.makeText(LocationActivity.this, "Got Coordinates: " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT).show();
-            locationManager.removeUpdates(this);
-        } catch (JSONException e) {
-            e.printStackTrace();
+                publishMessage(locationTopic, locationMessageData.toString());
+                showToast("Got Coordinates: " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT);
+                locationManager.removeUpdates(this);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
 
-    }
+    };
 
     private void requestLocation() {
+        Log.e("requestLocation ", "locationManager: " + locationManager);
         if (locationManager == null)
             locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        Log.e("requestLocation ", "locationManager: " + locationManager);
+        isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        Log.e("requestLocation ", "isGpsEnabled: " + isGPSEnabled);
+        Log.e("requestLocation ", "isNetworkEnabled: " + isNetworkEnabled);
+        if (isGPSEnabled) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-                        GPS_TIME_INTERVAL, GPS_DISTANCE, this);
+                if (location == null) {
+                    Log.e("requestLocation ", "requestLocationUpdates");
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+                            GPS_TIME_INTERVAL, GPS_DISTANCE, locationListener);
+                    if (locationManager != null) {
+                        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    }
+                }
+
             }
         }
     }
@@ -169,8 +207,8 @@ public class LocationActivity extends AppCompatActivity implements LocationListe
         }
     }
 
-    public void showToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    public void showToast(String msg, int duration) {
+        Toast.makeText(this, msg, duration).show();
     }
 
     public void publishMessage(String topic, String message) {
