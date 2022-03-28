@@ -48,6 +48,9 @@ public class LocationActivity extends AppCompatActivity {
     String locationTopic = "org.location";
     TextView username;
     TextView licensePlate;
+    TextView lat;
+    TextView lng;
+    TextView speed;
 
     Bundle extras;
 
@@ -68,7 +71,9 @@ public class LocationActivity extends AppCompatActivity {
 
         username = findViewById(R.id.activity_location_username);
         licensePlate = findViewById(R.id.activity_location_license_plate);
-
+        lat = findViewById(R.id.activity_location_lat);
+        lng = findViewById(R.id.activity_location_lng);
+        speed = findViewById(R.id.activity_location_speed);
 
         extras = getIntent().getExtras();
         if (extras != null) {
@@ -149,6 +154,10 @@ public class LocationActivity extends AppCompatActivity {
                 locationMessageData.put("lat", location.getLatitude());
                 locationMessageData.put("lng", location.getLongitude());
                 locationMessageData.put("speed", location.getSpeedAccuracyMetersPerSecond());
+
+                lat.setText(String.valueOf(location.getLatitude()));
+                lng.setText(String.valueOf(location.getLongitude()));
+                speed.setText(String.valueOf(location.getSpeedAccuracyMetersPerSecond()));
 
                 publishMessage(locationTopic, locationMessageData.toString());
                 showToast("Got Coordinates: " + location.getLatitude() + ", " + location.getLongitude(), Toast.LENGTH_SHORT);

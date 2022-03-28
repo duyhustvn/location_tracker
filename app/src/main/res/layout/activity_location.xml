@@ -36,13 +36,13 @@
                 android:layout_gravity="center_horizontal"
                 android:text="Tên"
                 android:textAlignment="center"
-                android:textSize="36sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/activity_location_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="22sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -50,14 +50,59 @@
                 android:layout_gravity="center_horizontal"
                 android:text="Biển số xe"
                 android:textAlignment="center"
-                android:textSize="36sp" />
+                android:textSize="12sp" />
 
 
             <TextView
                 android:id="@+id/activity_location_license_plate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="22sp" />
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Lat"
+                android:textAlignment="center"
+                android:textSize="12sp" />
+
+
+            <TextView
+                android:id="@+id/activity_location_lat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Long"
+                android:textAlignment="center"
+                android:textSize="12sp" />
+
+
+            <TextView
+                android:id="@+id/activity_location_lng"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Speed"
+                android:textAlignment="center"
+                android:textSize="12sp" />
+
+
+            <TextView
+                android:id="@+id/activity_location_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp" />
 
         </LinearLayout>
 
